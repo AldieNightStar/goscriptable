@@ -2,6 +2,7 @@ package goscriptable
 
 import (
 	"archive/zip"
+	"bytes"
 	"io"
 	"net/http"
 	"os"
@@ -50,6 +51,18 @@ func Run(workDir, cmd string, args ...string) {
 	c.Stderr = os.Stderr
 	c.Stdin = os.Stdin
 	c.Run()
+}
+
+func RunAndReturn(workDir, cmd string, args ...string) string {
+	data := make([]byte, 0, 128)
+	c := exec.Command(cmd, args...)
+	out := bytes.NewBuffer(data)
+	c.Dir = workDir
+	c.Stdout = out
+	c.Stderr = out
+	c.Stdin = os.Stdin
+	c.Run()
+	return strings.Trim(out.String(), " \n")
 }
 
 func MultiplyString(n int, s string) string {
@@ -169,4 +182,12 @@ func CopyDirectory(source, dest string) error {
 func TimeString() string {
 	ms := time.Now().UnixNano()
 	return strconv.FormatInt(ms, 16)
+}
+
+func RemoveSpaces(s []string) []string {
+	arr := make([]string, 0, 32)
+	for i := 0; i < len(s); i++ {
+		arr = append(arr, strings.Trim(s[i], " \n"))
+	}
+	return arr
 }
