@@ -100,6 +100,7 @@ func HttpGet(url string) []byte {
 
 func WriteToFile(filename string, data []byte) {
 	f := CreateFile(filename)
+	defer f.Close()
 	if f != nil {
 		f.Write(data)
 	}
@@ -160,6 +161,9 @@ func Open(filename string) *os.File {
 func CopyFile(filename string, dest string) bool {
 	f := Open(filename)
 	f2 := CreateFile(dest)
+
+	defer f.Close()
+	defer f2.Close()
 
 	if f == nil || f2 == nil {
 		return false
