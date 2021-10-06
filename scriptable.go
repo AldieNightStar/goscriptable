@@ -15,6 +15,53 @@ import (
 	"github.com/otiai10/copy"
 )
 
+func SaveData(fileName string, data map[string]string) {
+	sb := strings.Builder{}
+	sb.Grow(32)
+
+	for k, v := range data {
+		sb.WriteString(k)
+		sb.WriteString("=")
+		sb.WriteString(v)
+		sb.WriteString("\n")
+	}
+
+	WriteToFile(fileName, []byte(sb.String()))
+}
+
+func LoadData(fileName string) map[string]string {
+	if !IsFileExist(fileName) {
+		return make(map[string]string)
+	}
+	f := Open(fileName)
+	defer f.Close()
+
+	data, err := io.ReadAll(f)
+	if err != nil {
+		return nil
+	}
+
+	source := string(data)
+
+	configMap := make(map[string]string)
+
+	for _, line := range strings.Split(source, "\n") {
+		if len(line) < 1 {
+			continue
+		}
+		if !strings.Contains(line, "=") {
+			continue
+		}
+		arr := strings.SplitN(line, "=", 2)
+		if len(arr) < 2 {
+			continue
+		}
+		configMap[arr[0]] = arr[1]
+	}
+
+	return configMap
+}
+
 func GetOsArgs() []string {
 	return os.Args[1:]
 }
