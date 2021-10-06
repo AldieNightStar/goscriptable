@@ -191,3 +191,8 @@ func RemoveSpaces(s []string) []string {
 	}
 	return arr
 }
+
+func IsFileExist(name string) bool {
+	_, err := os.Stat(name)
+	return !os.IsNotExist(err)
+}
