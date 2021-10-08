@@ -2,12 +2,12 @@ package goscriptable
 
 import (
 	"archive/zip"
+	"bufio"
 	"bytes"
 	"io"
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -153,34 +153,6 @@ func WriteToFile(filename string, data []byte) {
 	}
 }
 
-func cloneZipItem(f *zip.File, dest string) bool {
-	// Create full directory path
-	path := filepath.Join(dest, f.Name)
-	err := os.MkdirAll(filepath.Dir(path), os.ModeDir|os.ModePerm)
-	if err != nil {
-		return false
-	}
-
-	// Clone if item is a file
-	rc, err := f.Open()
-	if err != nil {
-		return false
-	}
-	if !f.FileInfo().IsDir() {
-		fileCopy, err := os.Create(path)
-		if err != nil {
-			return false
-		}
-		_, err = io.Copy(fileCopy, rc)
-		fileCopy.Close()
-		if err != nil {
-			return false
-		}
-	}
-	rc.Close()
-	return true
-}
-
 func UnpackZip(filename string, dest string) bool {
 	r, err := zip.OpenReader(filename)
 	if err != nil {
@@ -246,4 +218,54 @@ func RemoveSpaces(s []string) []string {
 func IsFileExist(name string) bool {
 	_, err := os.Stat(name)
 	return !os.IsNotExist(err)
+}
+
+// Parses arguments in format: -a arg1 -b arg2 -c -d -e
+//		Example:
+//	 		-f filename -t title -z zip2 -link http://google.com/ -o -p -s -q
+func ParseArgs(args []string) map[string]string {
+	k := ""
+	paramMap := make(map[string]string)
+	var state byte = 0 // 0=none, 1=val-read
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		if len(arg) < 1 {
+			continue
+		}
+		if state == 0 { // None
+			if strings.HasPrefix(arg, "-") {
+				k = arg[1:]
+				state = 1 // Switch to Val-Read
+			}
+		} else if state == 1 { // Val-Read
+			if len(k) < 1 {
+				continue
+			}
+			if strings.HasPrefix(arg, "-") {
+				paramMap[k] = "true"
+				k = arg[1:]
+				state = 1 // Switch to Val-Read
+			} else {
+				paramMap[k] = arg
+				k = ""
+				state = 0 // Switch to None
+			}
+		}
+	}
+	if state == 1 && len(k) > 0 {
+		paramMap[k] = "true"
+	}
+	return paramMap
+}
+
+var inputReader *bufio.Reader = nil
+
+func Input(s string) string {
+	if inputReader == nil {
+		inputReader = bufio.NewReader(os.Stdin)
+	}
+	print(s)
+	t, _ := inputReader.ReadString('\n')
+	t = strings.Replace(t, "\n", "", -1)
+	return t
 }
