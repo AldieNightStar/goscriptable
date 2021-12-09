@@ -15,6 +15,25 @@ import (
 	"github.com/otiai10/copy"
 )
 
+// Returns Directory which user executed this app
+func CurrentDir() string {
+	path, err := os.Getwd()
+	if err != nil {
+		return ""
+	}
+	return path
+}
+
+// Returns Directory in which this app lives
+func CurrentExecutable() string {
+	path, err := os.Executable()
+	if err != nil {
+		return ""
+	}
+	return path
+}
+
+// Save configurateion data to a file
 func SaveData(fileName string, data map[string]string) {
 	sb := strings.Builder{}
 	sb.Grow(32)
@@ -29,6 +48,7 @@ func SaveData(fileName string, data map[string]string) {
 	WriteToFile(fileName, []byte(sb.String()))
 }
 
+// Load configuration data from a file
 func LoadData(fileName string) map[string]string {
 	if !IsFileExist(fileName) {
 		return make(map[string]string)
@@ -62,10 +82,12 @@ func LoadData(fileName string) map[string]string {
 	return configMap
 }
 
+// Get OS arguments. Ignores first one (app name)
 func GetOsArgs() []string {
 	return os.Args[1:]
 }
 
+// If string is present in a []string, then return it's index, or -1
 func In(elem string, list []string) int {
 	for i := 0; i < len(list); i++ {
 		if list[i] == elem {
@@ -75,14 +97,17 @@ func In(elem string, list []string) int {
 	return -1
 }
 
+// If string is present in a []string, then return true. Otherwise false
 func IsIn(elem string, list []string) bool {
 	return In(elem, list) > -1
 }
 
+// Create folder
 func CreateFolder(dir string) {
 	os.MkdirAll(dir, 0750)
 }
 
+// Create file
 func CreateFile(name string) *os.File {
 	f, err := os.Create(name)
 	if err != nil {
@@ -91,6 +116,8 @@ func CreateFile(name string) *os.File {
 	return f
 }
 
+// Run command in some directory
+// STD[IN, OUT, ERR] will be same as in this app
 func Run(workDir, cmd string, args ...string) {
 	c := exec.Command(cmd, args...)
 	c.Dir = workDir
@@ -100,6 +127,8 @@ func Run(workDir, cmd string, args ...string) {
 	c.Run()
 }
 
+// Run command in some directory
+// STDOUT will be returned as a string after call
 func RunAndReturn(workDir, cmd string, args ...string) string {
 	data := make([]byte, 0, 128)
 	c := exec.Command(cmd, args...)
@@ -112,6 +141,8 @@ func RunAndReturn(workDir, cmd string, args ...string) string {
 	return strings.Trim(out.String(), " \n")
 }
 
+// Multiply string with number.
+// MultiplyString(2, "abc") == "abcabc"
 func MultiplyString(n int, s string) string {
 	sb := strings.Builder{}
 	for i := 0; i < n; i++ {
@@ -120,6 +151,8 @@ func MultiplyString(n int, s string) string {
 	return sb.String()
 }
 
+// Tabulate all text in text:string.
+// Each line will be tabulated with whitespace
 func Tabulated(n int, text string) string {
 	arr := strings.Split(text, "\n")
 	for i := 0; i < len(arr); i++ {
@@ -128,11 +161,18 @@ func Tabulated(n int, text string) string {
 	return strings.Join(arr, "\n")
 }
 
+// Creates code block {}
+//	// Example
+//	Block("if(a==1)", "print(1);")
+//	// if(a==1) {
+//	// 	print(1);
+//	// }
 func Block(title string, code ...string) string {
 	s := Tabulated(4, strings.Join(code, "\n"))
 	return title + " {\n" + s + "\n}\n"
 }
 
+// Get data from HTTP GET request
 func HttpGet(url string) []byte {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -145,6 +185,7 @@ func HttpGet(url string) []byte {
 	return data
 }
 
+// Write something to file
 func WriteToFile(filename string, data []byte) {
 	f := CreateFile(filename)
 	defer f.Close()
@@ -153,6 +194,7 @@ func WriteToFile(filename string, data []byte) {
 	}
 }
 
+// Unpack zip folder
 func UnpackZip(filename string, dest string) bool {
 	r, err := zip.OpenReader(filename)
 	if err != nil {
@@ -165,10 +207,12 @@ func UnpackZip(filename string, dest string) bool {
 	return true
 }
 
+// Delete folder
 func Delete(dir string) error {
 	return os.RemoveAll(dir)
 }
 
+// Open file
 func Open(filename string) *os.File {
 	f, err := os.Open(filename)
 	if err != nil {
@@ -177,6 +221,7 @@ func Open(filename string) *os.File {
 	return f
 }
 
+// Copy file
 func CopyFile(filename string, dest string) bool {
 	f := Open(filename)
 	f2 := CreateFile(dest)
@@ -198,10 +243,12 @@ func CopyFile(filename string, dest string) bool {
 	return true
 }
 
+// Copy directory
 func CopyDirectory(source, dest string) error {
 	return copy.Copy(source, dest, copy.Options{})
 }
 
+// Get's time string
 func TimeString() string {
 	ms := time.Now().UnixNano()
 	return strconv.FormatInt(ms, 16)
@@ -260,6 +307,7 @@ func ParseArgs(args []string) map[string]string {
 
 var inputReader *bufio.Reader = nil
 
+// Asks user to input something in a console
 func Input(s string) string {
 	if inputReader == nil {
 		inputReader = bufio.NewReader(os.Stdin)
