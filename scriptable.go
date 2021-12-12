@@ -15,6 +15,51 @@ import (
 	"github.com/otiai10/copy"
 )
 
+// Read [[tag: data]] from any site/text/io you want
+// You can store any info you want inside other files
+// Returns data from tag
+// In case of error: ""
+func FindInside(data, tagname string) string {
+	tagPrefixLen := 4 + len(tagname) // Len of: "[[tagname: "
+	tagPrefixPos := strings.Index(data, "[["+tagname+": ")
+	if tagPrefixPos < 0 {
+		return ""
+	}
+	sb := strings.Builder{}
+	sb.Grow(32)
+	tagDataPos := tagPrefixPos + tagPrefixLen
+	endCount := 0
+	esc := false
+	for _, c := range data[tagDataPos:] {
+		if esc {
+			sb.WriteRune(c)
+			esc = false
+			continue
+		}
+		if c == '\\' {
+			esc = true
+			continue
+		}
+		if c == ']' {
+			endCount += 1
+			if endCount >= 2 {
+				break
+			}
+			continue
+		}
+		if endCount > 0 {
+			sb.WriteRune(']')
+			endCount -= 1
+		}
+		sb.WriteRune(c)
+	}
+	if endCount >= 2 {
+		return sb.String()
+	} else {
+		return ""
+	}
+}
+
 // Returns User home directory. Example: "/home/username" (without slash at end)
 // Or "" when error
 func HomeDir() string {
