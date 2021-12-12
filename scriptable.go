@@ -15,6 +15,16 @@ import (
 	"github.com/otiai10/copy"
 )
 
+// Returns User home directory. Example: "/home/username" (without slash at end)
+// Or "" when error
+func HomeDir() string {
+	d, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	return d
+}
+
 // Returns Directory which user executed this app
 func CurrentDir() string {
 	path, err := os.Getwd()
