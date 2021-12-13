@@ -15,7 +15,7 @@ import (
 	"github.com/otiai10/copy"
 )
 
-// Read [[tag: data]] from any site/text/io you want
+// Reads [[tag: data]] from any site/text/io you want
 // You can store any info you want inside other files
 // Returns data from tag
 // In case of error: ""
