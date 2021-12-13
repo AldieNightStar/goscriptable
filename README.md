@@ -68,9 +68,9 @@ a := s.ParseArgs(s.GetOsArgs())
 name := s.Input("Enter your name: ")
 
 // Parse splitted text by specified string
-// Ignores empty element
+// Ignores empty elements
 // Trim each string in a result
-arr := s.SplitStringBy(text, ",")
+arr := s.SplitStringBy("a, b, c", ",") // ["a","b","c"]
 ```
 * Data / Config
 ```go
