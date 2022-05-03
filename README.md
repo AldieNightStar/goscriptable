@@ -97,3 +97,10 @@ d.String() // Hello, Hi, 123
 
 d.Divide("+") // Hello+Hi+123
 ```
+
+* Find inside function
+	* Find's tags `[[name: ...]]` in a lot of texts or sites or some other sources
+```go
+// Will return data inside tag. If tag is "abc" then it will return data inside "[[abc: ...]]"
+s.FindInside(data, tagname)
+```
