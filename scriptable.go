@@ -322,44 +322,6 @@ func IsFileExist(name string) bool {
 	return !os.IsNotExist(err)
 }
 
-// Parses arguments in format: -a arg1 -b arg2 -c -d -e
-//		Example:
-//	 		-f filename -t title -z zip2 -link http://google.com/ -o -p -s -q
-func ParseArgs(args []string) map[string]string {
-	k := ""
-	paramMap := make(map[string]string)
-	var state byte = 0 // 0=none, 1=val-read
-	for i := 0; i < len(args); i++ {
-		arg := args[i]
-		if len(arg) < 1 {
-			continue
-		}
-		if state == 0 { // None
-			if strings.HasPrefix(arg, "-") {
-				k = arg[1:]
-				state = 1 // Switch to Val-Read
-			}
-		} else if state == 1 { // Val-Read
-			if len(k) < 1 {
-				continue
-			}
-			if strings.HasPrefix(arg, "-") {
-				paramMap[k] = "true"
-				k = arg[1:]
-				state = 1 // Switch to Val-Read
-			} else {
-				paramMap[k] = arg
-				k = ""
-				state = 0 // Switch to None
-			}
-		}
-	}
-	if state == 1 && len(k) > 0 {
-		paramMap[k] = "true"
-	}
-	return paramMap
-}
-
 var inputReader *bufio.Reader = nil
 
 // Asks user to input something in a console

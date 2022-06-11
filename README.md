@@ -61,9 +61,6 @@ s.WriteToFile("file.txt", data)
 // Open file or return nil
 file := s.Open(fileName)
 
-// Parse args into map[string]string
-a := s.ParseArgs(s.GetOsArgs())
-
 // Prompt user to input text data
 name := s.Input("Enter your name: ")
 
@@ -72,7 +69,22 @@ name := s.Input("Enter your name: ")
 // Trim each string in a result
 arr := s.SplitStringBy("a, b, c", ",") // ["a","b","c"]
 ```
+
+* Argument parsing
+
+```go
+// Parse arguments
+// Will return *Params object
+params := s.ParseArgs(s.GetOsArgs())
+params.IsPresent("git") // Check that parameter is present
+val := params.Get("git") // Get parameter value
+val.First() // First value of the parameter. Can be "true" if no values
+val.All() // Get []string of values
+val.Len() // Get length of values
+```
+
 * Data / Config
+
 ```go
 // Load config
 d := s.LoadData("x.dat")
