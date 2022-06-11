@@ -30,4 +30,7 @@ func TestArgsParser(t *testing.T) {
 			t.Fatal("numbers array is wrong")
 		}
 	}
+	if params.Len() != 7 {
+		t.Fatal("Len of the params should be 7")
+	}
 }

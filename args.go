@@ -33,6 +33,10 @@ func (p *Params) IsPresent(name string) bool {
 	return p.Get(name) != nil
 }
 
+func (p *Params) Len() int {
+	return len(p.m)
+}
+
 // ============================
 
 type ParamValue struct {
