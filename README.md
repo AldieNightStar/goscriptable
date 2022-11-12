@@ -70,49 +70,21 @@ name := s.Input("Enter your name: ")
 arr := s.SplitStringBy("a, b, c", ",") // ["a","b","c"]
 ```
 
-* Argument parsing
+# Argument Parsing
+
+Check https://github.com/AldieNightStar/argulo for more help
 
 ```go
-// Parse arguments
-// Will return *Params object
-params := s.ParseArgs(s.GetOsArgs())
-params.IsPresent("git") // Check that parameter is present
-val := params.Get("git") // Get parameter value
-val.First() // First value of the parameter. Can be "true" if no values
-val.All() // Get []string of values
-val.Len() // Get length of values
-```
+a := s.ArgParser("name").
+	Param("param", "This is my param").
+	Sample("-param a").
+	Sample("-param b").
+	RequiredParam("param2", "This is required param").
+	Sample("-param2 data").
+	Build().
+	ParseOs() // or Parse(args)
 
-* Data / Config
-
-```go
-// Load config
-d := s.LoadData("x.dat")
-
-// Write config
-d["a"] = "Alex"
-d["i"] = "Ihor"
-d["l"] = "Liza"
-
-// Save config
-s.SaveData("x.dat", d)
-```
-
-* String Divider
-```go
-d := s.NewDivString(", ")
-d.Append("Hello")
-d.Append("Hi")
-d.Append("123")
-
-d.String() // Hello, Hi, 123
-
-d.Divide("+") // Hello+Hi+123
-```
-
-* Find inside function
-	* Find's tags `[[name: ...]]` in a lot of texts or sites or some other sources
-```go
-// Will return data inside tag. If tag is "abc" then it will return data inside "[[abc: ...]]"
-s.FindInside(data, tagname)
+if a.ValidateOk() {
+	// Do something here
+}
 ```
